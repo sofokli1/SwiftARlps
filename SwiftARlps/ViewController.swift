@@ -9,6 +9,20 @@ import ARKit
 import SceneKit
 import UIKit
 
+extension SCNNode {
+    func updatePhysicsBody() {
+        guard let geometry = geometry,
+            let currentBody = physicsBody,
+            let currentShape = currentBody.physicsShape else {
+                return
+        }
+        let shape = SCNPhysicsShape(geometry: geometry, options: currentShape.options)
+        let body = SCNPhysicsBody(type: currentBody.type, shape: shape)
+        body.isAffectedByGravity = currentBody.isAffectedByGravity
+        physicsBody = body
+    }
+}
+
 class ViewController: UIViewController {
     
     // MARK: IBOutlets
@@ -26,6 +40,8 @@ class ViewController: UIViewController {
     // MARK: - UI Elements
     
     var focusSquare = FocusSquare()
+    var floor: Floor?
+    var index : Int = 1
     
     /// The view controller that displays the status and "restart experience" UI.
     lazy var statusViewController: StatusViewController = {
@@ -62,7 +78,7 @@ class ViewController: UIViewController {
         
         sceneView.delegate = self
         sceneView.session.delegate = self
-        sceneView.debugOptions = ARSCNDebugOptions.showFeaturePoints
+        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints, SCNDebugOptions.showPhysicsShapes]
 
         // Set up scene content.
         setupCamera()
@@ -88,6 +104,8 @@ class ViewController: UIViewController {
         // Set the delegate to ensure this gesture is only used when there are no virtual objects in the scene.
         tapGesture.delegate = self
         sceneView.addGestureRecognizer(tapGesture)
+        
+        
     }
 
 	override func viewDidAppear(_ animated: Bool) {
@@ -142,7 +160,7 @@ class ViewController: UIViewController {
         }
         
         if isObjectVisible {
-            focusSquare.hide()
+//            focusSquare.hide()
         } else {
             focusSquare.unhide()
             statusViewController.scheduleMessage("TRY MOVING LEFT OR RIGHT", inSeconds: 5.0, messageType: .focusSquare)

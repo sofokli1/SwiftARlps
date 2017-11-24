@@ -50,6 +50,8 @@ extension ViewController: ARSCNViewDelegate, ARSessionDelegate {
                 object.adjustOntoPlaneAnchor(planeAnchor, using: node)
             }
         }
+        
+        print(planeAnchor.extent)
     }
     
     func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {

@@ -30,12 +30,22 @@ extension ViewController: UIGestureRecognizerDelegate {
         return virtualObjectList.objects.isEmpty
     }
 
+    
+    
     @IBAction func addCube() {
         guard !addCubeButton.isHidden else { return }
+        if floor == nil {
+            floor = Floor()
+            virtualObjectList.add(object: self.floor!)
+            DispatchQueue.main.async {
+                self.placeVirtualObject(self.floor!)
+            }
+        }
         let cube = Cube()
         virtualObjectList.add(object: cube)
         DispatchQueue.main.async {
-            self.placeVirtualObject(cube)
+            self.placeVirtualObject(cube, atHeight: Float(CGFloat(self.index) * cube.size))
+            self.index += 1
         }
     }
     
@@ -60,6 +70,8 @@ extension ViewController: UIGestureRecognizerDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
             self.isRestartAvailable = true
         }
+        
+        floor = nil
     }
 }
 

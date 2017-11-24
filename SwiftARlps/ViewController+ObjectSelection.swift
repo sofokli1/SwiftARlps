@@ -31,6 +31,21 @@ extension ViewController: ModelObjectSelectionViewControllerDelegate {
         }
     }
     
+    func placeVirtualObject(_ virtualObject: VirtualObject, atHeight height: Float) {
+        guard let cameraTransform = session.currentFrame?.camera.transform,
+            let focusSquarePosition = focusSquare.lastPosition else {
+                statusViewController.showMessage("CANNOT PLACE OBJECT\nTry moving left or right.")
+                return
+        }
+        
+        virtualObjectInteraction.selectedObject = virtualObject
+        virtualObject.setPosition(float3([focusSquarePosition.x, focusSquarePosition.y + height, focusSquarePosition.z]), relativeTo: cameraTransform, smoothMovement: false)
+        
+        updateQueue.async {
+            self.sceneView.scene.rootNode.addChildNode(virtualObject)
+        }
+    }
+    
     // MARK: - ModelObjectSelectionViewControllerDelegate
     
     func modelObjectSelectionViewController(_: ModelObjectSelectionViewController, didSelectObject object: ModelObject) {
